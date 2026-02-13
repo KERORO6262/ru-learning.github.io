@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>俄語 33 字母點按發音</title>
+
+  <link rel="stylesheet" href="./css/base.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>俄語 33 字母學習站</h1>
+    <p class="subtitle">點按字母即可播放「字母名稱讀法」。</p>
+
+    <section class="panel" aria-label="controls">
+      <div class="row">
+        <label for="voiceSelect">語音（優先 ru-RU）</label>
+        <select id="voiceSelect"></select>
+
+        <button id="reloadVoicesBtn" type="button">重新載入語音</button>
+        <button id="stopBtn" type="button">停止</button>
+
+        <span class="tag" id="statusTag">準備中</span>
+      </div>
+
+      <div class="row">
+        <label for="rate">語速</label>
+        <select id="rate">
+          <option value="0.85">慢</option>
+          <option value="1" selected>正常</option>
+          <option value="1.15">快</option>
+        </select>
+
+        <label for="pitch">音高</label>
+        <select id="pitch">
+          <option value="0.95">低</option>
+          <option value="1" selected>正常</option>
+          <option value="1.08">高</option>
+        </select>
+
+        <button id="testBtn" type="button">測試：Привет</button>
+      </div>
+
+      <p class="small">若沒聲音，先重新載入語音，或到系統語音設定下載俄語語音。</p>
+    </section>
+
+    <section class="grid" id="lettersGrid" aria-label="letters grid"></section>
+  </div>
+
+  <!-- 重要：順序 -->
+  <script defer src="./js/data/letters.js"></script>
+  <script defer src="./js/core/tts.js"></script>
+  <script defer src="./js/ui/ui.js"></script>
+  <script defer src="./js/main.js"></script>
+</body>
+</html>
