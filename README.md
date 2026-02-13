@@ -22,16 +22,6 @@ Interactive Russian learning mini-site: Cyrillic alphabet now, expanding to voca
 - 桌機：雙擊 `index.html` 或拖曳到瀏覽器
 - 手機：若手機不方便開本機檔案，建議用 GitHub Pages 開啟
 
-### GitHub Pages（建議分享用）
-1. 推到 GitHub repo
-2. Repo Settings → Pages
-3. Source 選 `Deploy from a branch`
-4. Branch 選 `main` 和 `/ (root)`
-5. 等待 Pages 生效後，用提供的網址開啟
-
-你也可以在此放上 Demo 連結（自行替換）：
-- Live Demo: https://YOUR_GITHUB_USERNAME.github.io/ru-learning/
-
 ## 專案結構
 
 ru-learning/
@@ -77,3 +67,4 @@ main.js
 
 ## License
 採用 MIT License
+
