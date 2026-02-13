@@ -1,125 +1,64 @@
 (function () {
-    window.RuLettersApp = window.RuLettersApp || {};
+  window.RuLettersApp = window.RuLettersApp || {};
 
-    function TTS(opts) {
-        this.onStatus = (opts && opts.onStatus) ? opts.onStatus : function () { };
-        this.voices = [];
-        this.sortedVoices = [];
+  function TTS(opts) {
+    this.onStatus = (opts && opts.onStatus) ? opts.onStatus : function () {};
+    this.voices = [];
+    this.sortedVoices = [];
+  }
+
+  TTS.prototype.isSupported = function () {
+    return "speechSynthesis" in window;
+  };
+
+  TTS.prototype.loadVoices = function () {
+    if (!this.isSupported()) return [];
+    this.voices = window.speechSynthesis.getVoices() || [];
+    var ru = this.voices.filter(function (v) {
+      return (v.lang || "").toLowerCase().indexOf("ru") === 0;
+    });
+    this.sortedVoices = ru.concat(this.voices.filter(function (v) { return ru.indexOf(v) < 0; }));
+    return this.sortedVoices;
+  };
+
+  TTS.prototype.getVoiceByIndex = function (index) {
+    if (!this.sortedVoices.length) this.loadVoices();
+    return this.sortedVoices[index] || this.sortedVoices[0] || null;
+  };
+
+  TTS.prototype.stop = function () {
+    if (!this.isSupported()) return;
+    window.speechSynthesis.cancel();
+    this.onStatus("已停止");
+  };
+
+  TTS.prototype.speak = function (args) {
+    if (!this.isSupported()) {
+      alert("此瀏覽器不支援 SpeechSynthesis，建議改用 Chrome/Edge。");
+      return;
     }
 
-    TTS.prototype.isSupported = function () {
-        return "speechSynthesis" in window;
-    };
+    window.speechSynthesis.cancel();
 
-    TTS.prototype.loadVoices = function () {
-        if (!this.isSupported()) return [];
-        this.voices = window.speechSynthesis.getVoices() || [];
-        var ru = this.voices.filter(function (v) {
-            return (v.lang || "").toLowerCase().indexOf("ru") === 0;
-        });
-        this.sortedVoices = ru.concat(this.voices.filter(function (v) { return ru.indexOf(v) < 0; }));
-        return this.sortedVoices;
-    };
-
-    TTS.prototype.getVoiceByIndex = function (index) {
-        if (!this.sortedVoices.length) this.loadVoices();
-        return this.sortedVoices[index] || this.sortedVoices[0] || null;
-    };
-
-    TTS.prototype.getFirstRuVoice = function () {
-        if (!this.sortedVoices.length) this.loadVoices();
-        for (var i = 0; i < this.sortedVoices.length; i++) {
-            var v = this.sortedVoices[i];
-            if ((v.lang || "").toLowerCase().indexOf("ru") === 0) return v;
-        }
-        return null;
-    };
-
-    function hasCyrillic(text) {
-        return /[А-Яа-яЁё]/.test(text || "");
+    var ut = new SpeechSynthesisUtterance(args.text);
+    if (args.voice) {
+      ut.voice = args.voice;
+      ut.lang = args.voice.lang || "ru-RU";
+    } else {
+      ut.lang = "ru-RU";
     }
+    ut.rate = Number(args.rate || 1);
+    ut.pitch = Number(args.pitch || 1);
 
-    function normalizeNameForTTS(text) {
-        var t = String(text || "").trim();
-        var low = t.toLowerCase();
+    ut.onend = function () { if (args.onEnd) args.onEnd(); };
+    ut.onerror = function () {
+      if (args.onError) args.onError();
+      this.onStatus("播放失敗");
+    }.bind(this);
 
-        // Й：大部分 TTS 讀 "й" 會唸出標準名稱 "И краткое"。
-        // 若覺得太長想改聽短促音，可改 return "йот";
-        if (low === "и краткое") return "й";
+    window.speechSynthesis.speak(ut);
+    this.onStatus("播放中：" + args.text);
+  };
 
-        // Ъ：改傳符號 "ъ"。
-        // 傳全名 "твердый знак" 常導致 TTS 把它當句子唸（語速變慢或重複）。
-        // 傳符號 "ъ" 會觸發 TTS 的「字母拼讀模式」，讀音較標準。
-        if (low === "твёрдый знак" || low === "твердый знак") return "ъ";
-
-        // Ь：改傳符號 "ь"。原理同上。
-        if (low === "мягкий знак") return "ь";
-
-        // 保險：如果未來有人把 nameRu 塞成長句，最多取第一段
-        if (t.length > 60) {
-            var first = t.split(/[.!?。！？]/)[0].trim();
-            return first || t.slice(0, 60);
-        }
-
-        return t;
-    }
-
-    // 若使用者選到非俄語 voice，但內容是西里爾字母，優先切到 ru voice
-    TTS.prototype.pickBestVoice = function (requestedVoice, text) {
-        var v = requestedVoice || null;
-        if (hasCyrillic(text)) {
-            var vLang = (v && v.lang) ? v.lang.toLowerCase() : "";
-            if (v && vLang.indexOf("ru") !== 0) {
-                var ru = this.getFirstRuVoice();
-                if (ru) return ru;
-            }
-            if (!v) {
-                var ru2 = this.getFirstRuVoice();
-                if (ru2) return ru2;
-            }
-        }
-        return v;
-    };
-
-    TTS.prototype.stop = function () {
-        if (!this.isSupported()) return;
-        window.speechSynthesis.cancel();
-        this.onStatus("已停止");
-    };
-
-    TTS.prototype.speak = function (args) {
-        if (!this.isSupported()) {
-            alert("此瀏覽器不支援 SpeechSynthesis，建議改用 Chrome/Edge。");
-            return;
-        }
-
-        window.speechSynthesis.cancel();
-
-        var rawText = args.text;
-        var text = normalizeNameForTTS(rawText);
-
-        var voice = this.pickBestVoice(args.voice, text);
-
-        var ut = new SpeechSynthesisUtterance(text);
-        if (voice) {
-            ut.voice = voice;
-            ut.lang = voice.lang || "ru-RU";
-        } else {
-            ut.lang = "ru-RU";
-        }
-
-        ut.rate = Number(args.rate || 1);
-        ut.pitch = Number(args.pitch || 1);
-
-        ut.onend = function () { if (args.onEnd) args.onEnd(); };
-        ut.onerror = function () {
-            if (args.onError) args.onError();
-            this.onStatus("播放失敗");
-        }.bind(this);
-
-        window.speechSynthesis.speak(ut);
-        this.onStatus("播放中：" + text);
-    };
-
-    window.RuLettersApp.TTS = TTS;
+  window.RuLettersApp.TTS = TTS;
 })();
