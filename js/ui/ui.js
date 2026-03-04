@@ -308,7 +308,7 @@
   LettersUI.prototype.getQuizConfig = function (mode) {
     if (mode === "hint_to_letter") {
       return {
-        prompt: function (letter) { return letter.hint; },
+        prompt: function (letter) { return letter.nameRu; },
         answer: function (letter) { return letter.upper; },
         helpText: "看到英文讀音後，選出正確字母。"
       };
@@ -316,7 +316,7 @@
 
     return {
       prompt: function (letter) { return letter.upper; },
-      answer: function (letter) { return letter.hint; },
+      answer: function (letter) { return letter.nameRu; },
       helpText: "看到字母後，選出正確英文讀音。"
     };
   };
