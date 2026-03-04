@@ -29,6 +29,38 @@
   border-color: #3b5678;
 }
 
+.foldPanel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.foldTitle {
+  list-style: none;
+  cursor: pointer;
+  padding: 14px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.foldTitle::-webkit-details-marker {
+  display: none;
+}
+
+.foldTitle::after {
+  content: "▾";
+  float: right;
+  color: var(--muted2);
+  transition: transform .2s ease;
+}
+
+.foldPanel:not([open]) .foldTitle::after {
+  transform: rotate(-90deg);
+}
+
+.foldBody {
+  padding: 0 14px 14px;
+}
+
 .row {
   display: flex;
   gap: 10px;
