@@ -10,6 +10,25 @@
   margin-bottom: 14px;
 }
 
+.quickNav {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.quickNav a {
+  color: var(--text);
+  text-decoration: none;
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 8px 12px;
+  background: #0f1620;
+}
+
+.quickNav a:hover {
+  border-color: #3b5678;
+}
+
 .row {
   display: flex;
   gap: 10px;
@@ -75,9 +94,10 @@ button:active { transform: translateY(1px); }
 }
 
 .glyph {
-  font-size: 28px;
+  font-size: 34px;
   font-weight: 700;
   letter-spacing: 0.5px;
+  font-family: "Noto Sans", "Segoe UI", Arial, sans-serif;
 }
 
 .name {
@@ -94,4 +114,92 @@ button:active { transform: translateY(1px); }
 .playing {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(122,167,255,.18);
+}
+
+.quizPrompt {
+  font-size: 52px;
+  text-align: center;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 8px;
+  border: 1px dashed var(--border2);
+  border-radius: 12px;
+}
+
+.quizOptions {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.quizOption {
+  width: 100%;
+  padding: 12px;
+}
+
+.quizOption.correct {
+  border-color: var(--ok);
+  background: rgba(46, 157, 99, 0.25);
+}
+
+.quizOption.wrong {
+  border-color: var(--bad);
+  background: rgba(183, 74, 74, 0.25);
+}
+
+.vocabGrid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.vocabCard {
+  padding: 12px;
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  background: #0f1620;
+}
+
+.vocabWord {
+  font-size: 28px;
+  font-weight: 700;
+  font-family: "Noto Sans", "Segoe UI", Arial, sans-serif;
+}
+
+.vocabTranslit {
+  color: var(--muted2);
+  font-size: 13px;
+}
+
+.vocabMeaning {
+  margin-top: 6px;
+}
+
+.grammarList {
+  display: grid;
+  gap: 10px;
+}
+
+.grammarCard {
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  background: #0f1620;
+  padding: 12px;
+}
+
+.grammarCard h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.grammarCard ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+@media (max-width: 720px) {
+  .quizPrompt { font-size: 44px; }
+  .quizOptions { grid-template-columns: 1fr; }
+  .vocabGrid { grid-template-columns: 1fr; }
 }
