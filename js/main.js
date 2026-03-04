@@ -12,6 +12,9 @@
 
   function init() {
     ui.buildGrid();
+    ui.buildVocab();
+    ui.buildGrammar();
+    ui.nextQuiz();
     ui.bindControls();
     ui.populateVoices();
 
