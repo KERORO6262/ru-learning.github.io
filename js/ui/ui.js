@@ -53,7 +53,7 @@
       var btn = document.createElement("button");
       btn.className = "letterBtn";
       btn.type = "button";
-      btn.dataset.say = letter.nameRu;
+      btn.dataset.say = letter.soundRu || letter.lower;
 
       var glyph = document.createElement("div");
       glyph.className = "glyph";
@@ -61,7 +61,7 @@
 
       var name = document.createElement("div");
       name.className = "name";
-      name.textContent = "讀法：" + letter.nameRu;
+      name.textContent = "讀法：" + letter.nameRu; 
 
       var hint = document.createElement("div");
       hint.className = "hint";
@@ -349,7 +349,8 @@
       optionBtn.className = "quizOption";
       optionBtn.textContent = optionValue;
       optionBtn.dataset.value = optionValue;
-      optionBtn.dataset.say = optionLetter.nameRu || "";
+      optionBtn.dataset.say = optionLetter.soundRu || optionLetter.lower;
+      
       optionBtn.addEventListener("click", this.handleQuizAnswer.bind(this, optionBtn));
       this.elQuizOptions.appendChild(optionBtn);
     }
