@@ -16,6 +16,9 @@
     this.elQuizPrompt = document.getElementById("quizPrompt");
     this.elQuizOptions = document.getElementById("quizOptions");
     this.elQuizFeedback = document.getElementById("quizFeedback");
+    this.elQuizHelp = document.getElementById("quizHelp");
+    this.elQuizMode = document.getElementById("quizMode");
+    this.elNextQuizBtn = document.getElementById("nextQuizBtn");
 
     this.elVocabGrid = document.getElementById("vocabGrid");
     this.elGrammarList = document.getElementById("grammarList");
@@ -35,35 +38,34 @@
   };
 
   LettersUI.prototype.buildGrid = function () {
-    var LETTERS = window.RuLettersApp.LETTERS || [];
+    var letters = window.RuLettersApp.LETTERS || [];
     this.elGrid.innerHTML = "";
 
-    for (var i = 0; i < LETTERS.length; i++) {
-      var L = LETTERS[i];
+    for (var i = 0; i < letters.length; i++) {
+      var letter = letters[i];
       var card = document.createElement("div");
       card.className = "card";
 
       var btn = document.createElement("button");
       btn.className = "letterBtn";
       btn.type = "button";
-      btn.dataset.say = L.nameRu;
+      btn.dataset.say = letter.nameRu;
 
       var glyph = document.createElement("div");
       glyph.className = "glyph";
-      glyph.textContent = L.upper + " " + L.lower;
+      glyph.textContent = letter.upper + " " + letter.lower;
 
       var name = document.createElement("div");
       name.className = "name";
-      name.textContent = "讀法：" + L.nameRu;
+      name.textContent = "讀法：" + letter.nameRu;
 
       var hint = document.createElement("div");
       hint.className = "hint";
-      hint.textContent = "提示：" + L.hint;
+      hint.textContent = "提示：" + letter.hint;
 
       btn.appendChild(glyph);
       btn.appendChild(name);
       btn.appendChild(hint);
-
       btn.addEventListener("click", this.playLetter.bind(this, btn));
 
       card.appendChild(btn);
@@ -116,7 +118,6 @@
       title.textContent = grammarRule.title;
 
       var list = document.createElement("ul");
-
       for (var j = 0; j < grammarRule.points.length; j++) {
         var point = document.createElement("li");
         point.textContent = grammarRule.points[j];
@@ -130,28 +131,28 @@
   };
 
   LettersUI.prototype.populateVoices = function () {
-    var list = this.tts.loadVoices();
+    var voiceList = this.tts.loadVoices();
     this.elVoiceSelect.innerHTML = "";
 
-    if (!list.length) {
-      var opt = document.createElement("option");
-      opt.value = "";
-      opt.textContent = "無可用語音";
-      this.elVoiceSelect.appendChild(opt);
+    if (!voiceList.length) {
+      var emptyOption = document.createElement("option");
+      emptyOption.value = "";
+      emptyOption.textContent = "無可用語音";
+      this.elVoiceSelect.appendChild(emptyOption);
       this.setStatus("找不到語音");
       return;
     }
 
-    for (var i = 0; i < list.length; i++) {
-      var v = list[i];
-      var opt2 = document.createElement("option");
-      opt2.value = String(i);
-      opt2.textContent = v.name + " (" + v.lang + ")";
-      this.elVoiceSelect.appendChild(opt2);
+    for (var i = 0; i < voiceList.length; i++) {
+      var voice = voiceList[i];
+      var voiceOption = document.createElement("option");
+      voiceOption.value = String(i);
+      voiceOption.textContent = voice.name + " (" + voice.lang + ")";
+      this.elVoiceSelect.appendChild(voiceOption);
     }
 
-    var hasRu = list.some(function (v) {
-      return (v.lang || "").toLowerCase().indexOf("ru") === 0;
+    var hasRu = voiceList.some(function (voiceItem) {
+      return (voiceItem.lang || "").toLowerCase().indexOf("ru") === 0;
     });
 
     this.elVoiceSelect.selectedIndex = 0;
@@ -189,47 +190,68 @@
   };
 
   LettersUI.prototype.pickRandomItems = function (source, neededCount, skipItem) {
-    var list = [];
-
+    var pool = [];
     for (var i = 0; i < source.length; i++) {
       if (skipItem && source[i].upper === skipItem.upper) continue;
-      list.push(source[i]);
+      pool.push(source[i]);
     }
 
-    for (var j = list.length - 1; j > 0; j--) {
-      var k = Math.floor(Math.random() * (j + 1));
-      var tmp = list[j];
-      list[j] = list[k];
-      list[k] = tmp;
+    for (var j = pool.length - 1; j > 0; j--) {
+      var randomIndex = Math.floor(Math.random() * (j + 1));
+      var current = pool[j];
+      pool[j] = pool[randomIndex];
+      pool[randomIndex] = current;
     }
 
-    return list.slice(0, neededCount);
+    return pool.slice(0, neededCount);
+  };
+
+  LettersUI.prototype.getQuizConfig = function (mode) {
+    if (mode === "hint_to_letter") {
+      return {
+        prompt: function (letter) { return letter.hint; },
+        answer: function (letter) { return letter.upper; },
+        helpText: "看到英文讀音後，選出正確字母。"
+      };
+    }
+
+    return {
+      prompt: function (letter) { return letter.upper; },
+      answer: function (letter) { return letter.hint; },
+      helpText: "看到字母後，選出正確英文讀音。"
+    };
   };
 
   LettersUI.prototype.nextQuiz = function () {
     var letters = window.RuLettersApp.LETTERS || [];
-    var randomIndex = Math.floor(Math.random() * letters.length);
-    var answerLetter = letters[randomIndex];
-    var options = this.pickRandomItems(letters, 3, answerLetter);
+    if (!letters.length) return;
 
+    var mode = this.elQuizMode ? this.elQuizMode.value : "letter_to_hint";
+    var config = this.getQuizConfig(mode);
+
+    var answerLetter = letters[Math.floor(Math.random() * letters.length)];
+    var options = this.pickRandomItems(letters, 3, answerLetter);
     options.push(answerLetter);
     options = this.pickRandomItems(options, options.length);
 
-    this.quizAnswer = answerLetter.hint;
+    this.quizAnswer = config.answer(answerLetter);
     this.quizLocked = false;
-    this.elQuizPrompt.textContent = answerLetter.upper;
+    this.elQuizPrompt.textContent = config.prompt(answerLetter);
     this.elQuizOptions.innerHTML = "";
     this.elQuizFeedback.textContent = "請選擇答案。";
+    this.elQuizHelp.textContent = config.helpText;
 
     for (var i = 0; i < options.length; i++) {
-      var option = options[i];
-      var btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "quizOption";
-      btn.textContent = option.hint;
-      btn.dataset.value = option.hint;
-      btn.addEventListener("click", this.handleQuizAnswer.bind(this, btn));
-      this.elQuizOptions.appendChild(btn);
+      var optionLetter = options[i];
+      var optionBtn = document.createElement("button");
+      var optionValue = config.answer(optionLetter);
+
+      optionBtn.type = "button";
+      optionBtn.className = "quizOption";
+      optionBtn.textContent = optionValue;
+      optionBtn.dataset.value = optionValue;
+      optionBtn.addEventListener("click", this.handleQuizAnswer.bind(this, optionBtn));
+      this.elQuizOptions.appendChild(optionBtn);
     }
   };
 
@@ -240,13 +262,13 @@
     if (isCorrect) {
       this.quizLocked = true;
       btn.classList.add("correct");
-      this.elQuizFeedback.textContent = "答對了！下一題...";
+      this.elQuizFeedback.textContent = "答對了！1 秒後切換下一題。";
       setTimeout(this.nextQuiz.bind(this), 1000);
       return;
     }
 
     btn.classList.add("wrong");
-    this.elQuizFeedback.textContent = "再試一次。";
+    this.elQuizFeedback.textContent = "答錯了，再試一次。";
   };
 
   LettersUI.prototype.bindControls = function () {
@@ -266,6 +288,18 @@
       self.clearPlaying();
       self.speakText("Привет");
     });
+
+    if (this.elQuizMode) {
+      this.elQuizMode.addEventListener("change", function () {
+        self.nextQuiz();
+      });
+    }
+
+    if (this.elNextQuizBtn) {
+      this.elNextQuizBtn.addEventListener("click", function () {
+        self.nextQuiz();
+      });
+    }
   };
 
   window.RuLettersApp.LettersUI = LettersUI;
