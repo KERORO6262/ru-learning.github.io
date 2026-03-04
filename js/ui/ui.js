@@ -73,35 +73,69 @@
     }
   };
 
-  LettersUI.prototype.buildVocab = function () {
-    var vocabList = window.RuLettersApp.BASIC_VOCAB || [];
-    this.elVocabGrid.innerHTML = "";
+  LettersUI.prototype.groupVocabByCategory = function (vocabList) {
+    var grouped = {};
 
     for (var i = 0; i < vocabList.length; i++) {
       var vocabItem = vocabList[i];
-      var card = document.createElement("button");
-      card.className = "vocabCard";
-      card.type = "button";
-      card.dataset.say = vocabItem.word;
+      var categoryName = vocabItem.category || "未分類";
+      if (!grouped[categoryName]) grouped[categoryName] = [];
+      grouped[categoryName].push(vocabItem);
+    }
 
-      var word = document.createElement("div");
-      word.className = "vocabWord";
-      word.textContent = vocabItem.word;
+    return grouped;
+  };
 
-      var translit = document.createElement("div");
-      translit.className = "vocabTranslit";
-      translit.textContent = vocabItem.translit;
+  LettersUI.prototype.buildVocab = function () {
+    var vocabList = window.RuLettersApp.BASIC_VOCAB || [];
+    var groupedVocab = this.groupVocabByCategory(vocabList);
+    var categories = Object.keys(groupedVocab);
 
-      var meaning = document.createElement("div");
-      meaning.className = "vocabMeaning";
-      meaning.textContent = vocabItem.meaning;
+    this.elVocabGrid.innerHTML = "";
 
-      card.appendChild(word);
-      card.appendChild(translit);
-      card.appendChild(meaning);
-      card.addEventListener("click", this.playVocab.bind(this, card));
+    for (var i = 0; i < categories.length; i++) {
+      var categoryName = categories[i];
+      var categorySection = document.createElement("section");
+      categorySection.className = "vocabCategory";
 
-      this.elVocabGrid.appendChild(card);
+      var categoryTitle = document.createElement("h3");
+      categoryTitle.className = "vocabCategoryTitle";
+      categoryTitle.textContent = categoryName;
+      categorySection.appendChild(categoryTitle);
+
+      var categoryGrid = document.createElement("div");
+      categoryGrid.className = "vocabCategoryGrid";
+
+      var categoryItems = groupedVocab[categoryName];
+      for (var j = 0; j < categoryItems.length; j++) {
+        var vocabItem = categoryItems[j];
+        var card = document.createElement("button");
+        card.className = "vocabCard";
+        card.type = "button";
+        card.dataset.say = vocabItem.word;
+
+        var word = document.createElement("div");
+        word.className = "vocabWord";
+        word.textContent = vocabItem.word;
+
+        var translit = document.createElement("div");
+        translit.className = "vocabTranslit";
+        translit.textContent = vocabItem.translit;
+
+        var meaning = document.createElement("div");
+        meaning.className = "vocabMeaning";
+        meaning.textContent = vocabItem.meaning;
+
+        card.appendChild(word);
+        card.appendChild(translit);
+        card.appendChild(meaning);
+        card.addEventListener("click", this.playVocab.bind(this, card));
+
+        categoryGrid.appendChild(card);
+      }
+
+      categorySection.appendChild(categoryGrid);
+      this.elVocabGrid.appendChild(categorySection);
     }
   };
 
@@ -116,15 +150,41 @@
 
       var title = document.createElement("h3");
       title.textContent = grammarRule.title;
+      card.appendChild(title);
 
-      var list = document.createElement("ul");
-      for (var j = 0; j < grammarRule.points.length; j++) {
-        var point = document.createElement("li");
-        point.textContent = grammarRule.points[j];
-        list.appendChild(point);
+      if (grammarRule.overview) {
+        var overview = document.createElement("p");
+        overview.className = "grammarOverview";
+        overview.textContent = grammarRule.overview;
+        card.appendChild(overview);
       }
 
-      card.appendChild(title);
+      var list = document.createElement("ul");
+      var points = grammarRule.points || [];
+
+      for (var j = 0; j < points.length; j++) {
+        var point = points[j];
+        var item = document.createElement("li");
+
+        if (typeof point === "string") {
+          item.textContent = point;
+        } else {
+          var rule = document.createElement("strong");
+          rule.textContent = point.rule || "";
+
+          item.appendChild(rule);
+
+          if (point.example) {
+            var example = document.createElement("div");
+            example.className = "grammarExample";
+            example.textContent = point.example;
+            item.appendChild(example);
+          }
+        }
+
+        list.appendChild(item);
+      }
+
       card.appendChild(list);
       this.elGrammarList.appendChild(card);
     }

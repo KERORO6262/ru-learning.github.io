@@ -70,6 +70,38 @@ button:active { transform: translateY(1px); }
   grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
+
+.vocabCategory {
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 10px;
+  background: rgba(15,22,32,.55);
+}
+
+.vocabCategoryTitle {
+  margin: 0 0 10px;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.vocabCategoryGrid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grammarOverview {
+  margin: 0 0 10px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.grammarExample {
+  margin-top: 4px;
+  color: var(--muted2);
+  line-height: 1.5;
+  font-size: 13px;
+}
 @media (max-width: 720px) {
   .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
@@ -149,8 +181,8 @@ button:active { transform: translateY(1px); }
 
 .vocabGrid {
   display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  grid-template-columns: 1fr;
 }
 
 .vocabCard {
@@ -201,5 +233,5 @@ button:active { transform: translateY(1px); }
 @media (max-width: 720px) {
   .quizPrompt { font-size: 44px; }
   .quizOptions { grid-template-columns: 1fr; }
-  .vocabGrid { grid-template-columns: 1fr; }
+  .vocabCategoryGrid { grid-template-columns: 1fr; }
 }
