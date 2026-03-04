@@ -23,6 +23,10 @@
     this.elVocabGrid = document.getElementById("vocabGrid");
     this.elGrammarList = document.getElementById("grammarList");
 
+    this.elQuickNav = document.querySelector(".quickNav");
+    this.elTabLinks = document.querySelectorAll(".quickNav a");
+    this.elTabPanels = document.querySelectorAll(".tab-content");
+
     this.currentBtn = null;
     this.quizAnswer = null;
     this.quizLocked = false;
@@ -188,6 +192,41 @@
       card.appendChild(list);
       this.elGrammarList.appendChild(card);
     }
+  };
+
+  LettersUI.prototype.switchTab = function (targetId) {
+    if (!targetId) return;
+
+    for (var i = 0; i < this.elTabPanels.length; i++) {
+      var panel = this.elTabPanels[i];
+      var active = panel.id === targetId;
+      panel.classList.toggle("active", active);
+      panel.classList.toggle("hidden", !active);
+    }
+
+    for (var j = 0; j < this.elTabLinks.length; j++) {
+      var link = this.elTabLinks[j];
+      var href = (link.getAttribute("href") || "").replace("#", "");
+      link.classList.toggle("active", href === targetId);
+    }
+  };
+
+  LettersUI.prototype.bindTabs = function () {
+    var self = this;
+    if (!this.elQuickNav) return;
+
+    this.elQuickNav.addEventListener("click", function (event) {
+      var target = event.target;
+      if (!target || target.tagName !== "A") return;
+
+      var targetId = (target.getAttribute("href") || "").replace("#", "");
+      if (!targetId) return;
+
+      event.preventDefault();
+      self.switchTab(targetId);
+    });
+
+    this.switchTab("lettersSection");
   };
 
   LettersUI.prototype.populateVoices = function () {
@@ -360,6 +399,8 @@
         self.nextQuiz();
       });
     }
+
+    this.bindTabs();
   };
 
   window.RuLettersApp.LettersUI = LettersUI;

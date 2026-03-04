@@ -15,6 +15,7 @@
     <p class="subtitle">點按字母即可播放「字母名稱讀法」。</p>
 
     <nav class="panel quickNav" aria-label="快速導覽">
+      <a href="#lettersSection" class="active">首頁</a>
       <a href="#quizSection">測驗</a>
       <a href="#vocabSection">單字</a>
       <a href="#grammarSection">文法</a>
@@ -52,39 +53,36 @@
       <p class="small">若沒聲音，先重新載入語音，或到系統語音設定下載俄語語音。</p>
     </section>
 
-    <details id="quizSection" class="panel foldPanel" open>
-      <summary class="foldTitle">測驗</summary>
-      <div class="foldBody" aria-label="字母挑戰測驗">
-        <div class="row">
-          <label for="quizMode">出題模式</label>
-          <select id="quizMode">
-            <option value="letter_to_hint" selected>看字母選英文讀音</option>
-            <option value="hint_to_letter">看英文讀音選字母</option>
-          </select>
-          <button id="nextQuizBtn" type="button">更換題目</button>
-        </div>
-        <p class="small" id="quizHelp">看到字母後，選出正確英文讀音。</p>
-        <div class="quizPrompt" id="quizPrompt">--</div>
-        <div class="quizOptions" id="quizOptions"></div>
-        <p class="small" id="quizFeedback">請選擇答案。</p>
-      </div>
-    </details>
+    <section id="lettersSection" class="panel tab-content active" aria-label="letters view">
+      <h2>字母首頁</h2>
+      <section class="grid" id="lettersGrid" aria-label="letters grid"></section>
+    </section>
 
-    <section class="grid" id="lettersGrid" aria-label="letters grid"></section>
-
-    <details id="vocabSection" class="panel foldPanel" open>
-      <summary class="foldTitle">單字</summary>
-      <div class="foldBody" aria-label="基礎單字">
-        <div class="vocabGrid" id="vocabGrid"></div>
+    <section id="quizSection" class="panel tab-content hidden" aria-label="字母挑戰測驗">
+      <h2>測驗</h2>
+      <div class="row">
+        <label for="quizMode">出題模式</label>
+        <select id="quizMode">
+          <option value="letter_to_hint" selected>看字母選英文讀音</option>
+          <option value="hint_to_letter">看英文讀音選字母</option>
+        </select>
+        <button id="nextQuizBtn" type="button">更換題目</button>
       </div>
-    </details>
+      <p class="small" id="quizHelp">看到字母後，選出正確英文讀音。</p>
+      <div class="quizPrompt" id="quizPrompt">--</div>
+      <div class="quizOptions" id="quizOptions"></div>
+      <p class="small" id="quizFeedback">請選擇答案。</p>
+    </section>
 
-    <details id="grammarSection" class="panel foldPanel" open>
-      <summary class="foldTitle">文法</summary>
-      <div class="foldBody" aria-label="文法基礎">
-        <div id="grammarList" class="grammarList"></div>
-      </div>
-    </details>
+    <section id="vocabSection" class="panel tab-content hidden" aria-label="基礎單字">
+      <h2>單字</h2>
+      <div class="vocabGrid" id="vocabGrid"></div>
+    </section>
+
+    <section id="grammarSection" class="panel tab-content hidden" aria-label="文法基礎">
+      <h2>文法</h2>
+      <div id="grammarList" class="grammarList"></div>
+    </section>
   </div>
 
   <script defer src="./js/data/letters.js"></script>

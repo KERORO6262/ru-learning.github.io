@@ -29,36 +29,23 @@
   border-color: #3b5678;
 }
 
-.foldPanel {
-  padding: 0;
-  overflow: hidden;
+.quickNav a.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(122,167,255,.2);
+  background: #142235;
 }
 
-.foldTitle {
-  list-style: none;
-  cursor: pointer;
-  padding: 14px;
-  font-size: 20px;
-  font-weight: 700;
+.tab-content {
+  transition: opacity .2s ease, transform .2s ease;
 }
 
-.foldTitle::-webkit-details-marker {
+.tab-content.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hidden {
   display: none;
-}
-
-.foldTitle::after {
-  content: "▾";
-  float: right;
-  color: var(--muted2);
-  transition: transform .2s ease;
-}
-
-.foldPanel:not([open]) .foldTitle::after {
-  transform: rotate(-90deg);
-}
-
-.foldBody {
-  padding: 0 14px 14px;
 }
 
 .row {
