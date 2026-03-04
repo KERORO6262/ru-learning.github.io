@@ -349,6 +349,7 @@
       optionBtn.className = "quizOption";
       optionBtn.textContent = optionValue;
       optionBtn.dataset.value = optionValue;
+      optionBtn.dataset.say = optionLetter.nameRu || "";
       optionBtn.addEventListener("click", this.handleQuizAnswer.bind(this, optionBtn));
       this.elQuizOptions.appendChild(optionBtn);
     }
@@ -356,6 +357,9 @@
 
   LettersUI.prototype.handleQuizAnswer = function (btn) {
     if (this.quizLocked) return;
+
+    var letterPronunciation = btn.dataset.say || "";
+    if (letterPronunciation) this.speakText(letterPronunciation);
 
     var isCorrect = btn.dataset.value === this.quizAnswer;
     if (isCorrect) {
