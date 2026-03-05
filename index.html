@@ -11,7 +11,17 @@
 
 <body>
   <div class="wrap">
-    <h1>俄語 33 字母學習站</h1>
+    <header class="topBar">
+      <h1>俄語 33 字母學習站</h1>
+      <div class="themeSwitch" aria-label="主題切換">
+        <label for="themeSelect" class="themeSwitchLabel">主題</label>
+        <select id="themeSelect">
+          <option value="system" selected>系統預設</option>
+          <option value="light">淡色</option>
+          <option value="dark">暗色</option>
+        </select>
+      </div>
+    </header>
     <p class="subtitle">點按字母即可播放「字母名稱讀法」。</p>
 
     <nav class="panel quickNav" aria-label="快速導覽">
@@ -23,13 +33,6 @@
 
     <section class="panel" aria-label="controls">
       <div class="row">
-        <label for="themeSelect">主題</label>
-        <select id="themeSelect">
-          <option value="system" selected>系統預設</option>
-          <option value="light">淡色</option>
-          <option value="dark">暗色</option>
-        </select>
-
         <label for="voiceSelect">語音（優先 ru-RU）</label>
         <select id="voiceSelect"></select>
 
