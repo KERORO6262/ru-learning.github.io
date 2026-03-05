@@ -13,6 +13,19 @@
   --shadow-soft: 0 10px 30px rgba(24, 39, 75, 0.08);
   --shadow-hover: 0 14px 34px rgba(24, 39, 75, 0.14);
 
+  --page-gradient-start: #ffffff;
+  --control-bg: #ffffff;
+  --control-border: #d9e2ec;
+  --control-hover-border: #b6c8de;
+  --control-grad-start: #ffffff;
+  --control-grad-end: #f4f7fb;
+  --tag-border: #d8e4f2;
+  --tag-bg: #f8fbff;
+  --text-strong: #1f2a37;
+  --text-mid: #3f4d5e;
+  --accent-contrast: #ffffff;
+
+
   font-family: "Inter", "Noto Sans", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -24,7 +37,7 @@ html, body {
 }
 
 body {
-  background: radial-gradient(circle at top, #ffffff 0%, var(--bg) 45%);
+  background: radial-gradient(circle at top, var(--page-gradient-start) 0%, var(--bg) 45%);
   color: var(--text);
   line-height: 1.65;
   padding: 28px;
@@ -64,4 +77,31 @@ h2 {
   body { padding: 16px; }
   h1 { font-size: 26px; }
   h2 { font-size: 21px; }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0b1220;
+  --surface: #111a2c;
+  --surface-soft: #182338;
+  --text: #e5edf8;
+  --muted: #b4c0d4;
+  --muted2: #8ea0ba;
+  --border: #273955;
+  --accent: #5b9dff;
+  --accent-strong: #2f7ce8;
+  --ok: #35c774;
+  --bad: #f07474;
+  --shadow-soft: 0 10px 26px rgba(5, 8, 15, 0.45);
+  --shadow-hover: 0 14px 34px rgba(5, 8, 15, 0.62);
+  --page-gradient-start: #152238;
+  --control-bg: #1a2740;
+  --control-border: #2f4467;
+  --control-hover-border: #4d6996;
+  --control-grad-start: #1f2f4b;
+  --control-grad-end: #1a2740;
+  --tag-border: #36527b;
+  --tag-bg: #1a2942;
+  --text-strong: #f1f5fd;
+  --text-mid: #cfdbec;
+  --accent-contrast: #ffffff;
 }

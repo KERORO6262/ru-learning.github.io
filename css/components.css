@@ -29,14 +29,14 @@
 
 .quickNav a:hover {
   color: var(--accent-strong);
-  border-color: #c8ddff;
-  background: #eff6ff;
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
 }
 
 .quickNav a.active {
-  color: #fff;
+  color: var(--accent-contrast);
   background: linear-gradient(180deg, var(--accent) 0%, var(--accent-strong) 100%);
-  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.25);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 .tab-content {
@@ -69,9 +69,9 @@ label {
 
 select,
 button {
-  background: #fff;
+  background: var(--control-bg);
   color: var(--text);
-  border: 1px solid #d9e2ec;
+  border: 1px solid var(--control-border);
   border-radius: 12px;
   padding: 11px 13px;
   font-size: 14px;
@@ -82,12 +82,12 @@ button {
 button {
   cursor: pointer;
   font-weight: 600;
-  background: linear-gradient(180deg, #ffffff 0%, #f4f7fb 100%);
+  background: linear-gradient(180deg, var(--control-grad-start) 0%, var(--control-grad-end) 100%);
 }
 
 button:hover,
 select:hover {
-  border-color: #b6c8de;
+  border-color: var(--control-hover-border);
   box-shadow: 0 4px 12px rgba(24, 39, 75, 0.08);
 }
 
@@ -98,11 +98,11 @@ button:active {
 .tag {
   display: inline-block;
   padding: 4px 10px;
-  border: 1px solid #d8e4f2;
+  border: 1px solid var(--tag-border);
   border-radius: 999px;
   font-size: 12px;
   color: var(--muted);
-  background: #f8fbff;
+  background: var(--tag-bg);
 }
 
 .grid {
@@ -112,7 +112,7 @@ button:active {
 }
 
 .card {
-  background: #fff;
+  background: var(--control-bg);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 0;
@@ -127,13 +127,13 @@ button:active {
   padding: 14px 12px;
   border-radius: 14px;
   border: 1px solid transparent;
-  background: #fff;
+  background: var(--control-bg);
   text-align: center;
 }
 
 .letterBtn:hover {
   transform: translateY(-5px);
-  border-color: #9fc4ff;
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
   box-shadow: var(--shadow-hover);
 }
 
@@ -141,7 +141,7 @@ button:active {
   font-size: 36px;
   font-weight: 800;
   letter-spacing: 0.01em;
-  color: #1f2a37;
+  color: var(--text-strong);
   font-family: "Noto Sans", "Segoe UI", Arial, sans-serif;
 }
 
@@ -157,7 +157,7 @@ button:active {
 
 .playing {
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.14);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 .quizPrompt {
@@ -166,10 +166,10 @@ button:active {
   font-weight: 800;
   line-height: 1.1;
   padding: 14px;
-  border: 1px solid #dbe7f4;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, var(--text) 10%);
   border-radius: 14px;
-  background: #f9fcff;
-  color: #1f2a37;
+  background: color-mix(in srgb, var(--surface) 82%, var(--accent) 8%);
+  color: var(--text-strong);
 }
 
 .quizOptions {
@@ -204,7 +204,7 @@ button:active {
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 12px;
-  background: #fff;
+  background: var(--control-bg);
 }
 
 .vocabCategoryTitle {
@@ -222,20 +222,20 @@ button:active {
 
 .vocabCard {
   padding: 12px;
-  border: 1px solid #dbe5f0;
+  border: 1px solid color-mix(in srgb, var(--border) 82%, var(--text) 10%);
   border-radius: 12px;
-  background: #fff;
+  background: var(--control-bg);
 }
 
 .vocabCard:hover {
-  border-color: #a7c8ff;
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
   transform: translateY(-2px);
 }
 
 .vocabWord {
   font-size: 28px;
   font-weight: 800;
-  color: #182536;
+  color: var(--text-strong);
   font-family: "Noto Sans", "Segoe UI", Arial, sans-serif;
 }
 
@@ -246,7 +246,7 @@ button:active {
 
 .vocabMeaning {
   margin-top: 6px;
-  color: #3f4d5e;
+  color: var(--text-mid);
 }
 
 .grammarList {
@@ -257,7 +257,7 @@ button:active {
 .grammarCard {
   border: 1px solid var(--border);
   border-radius: 14px;
-  background: #fff;
+  background: var(--control-bg);
   padding: 14px;
 }
 
@@ -282,7 +282,7 @@ button:active {
 .grammarCard ul {
   margin: 0;
   padding-left: 18px;
-  color: #495869;
+  color: var(--text-mid);
 }
 
 @media (max-width: 900px) {
