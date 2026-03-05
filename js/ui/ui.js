@@ -19,9 +19,11 @@
     this.elQuizHelp = document.getElementById("quizHelp");
     this.elQuizMode = document.getElementById("quizMode");
     this.elNextQuizBtn = document.getElementById("nextQuizBtn");
+    this.elQuizTimedScoreBtn = document.getElementById("quizTimedScoreBtn");
     this.elQuizPlayPromptBtn = document.getElementById("quizPlayPromptBtn");
     this.elQuizScore = document.getElementById("quizScore");
     this.elQuizStreak = document.getElementById("quizStreak");
+    this.elQuizTimedStatus = document.getElementById("quizTimedStatus");
 
     this.elQuizHistoryBtn = document.getElementById("quizHistoryBtn");
     this.elQuizHistoryDialog = document.getElementById("quizHistoryDialog");
@@ -46,6 +48,11 @@
     this.quizHistoryLimit = 20;
     this.quizHistory = [];
     this.quizOptionTapStats = {};
+    this.quizTimedDurationMs = 90 * 1000;
+    this.quizTimedModeActive = false;
+    this.quizTimedCorrectCount = 0;
+    this.quizTimedEndAt = 0;
+    this.quizTimedTimerId = null;
   }
 
   LettersUI.prototype.setStatus = function (text) {
@@ -348,6 +355,62 @@
     if (this.elQuizStreak) this.elQuizStreak.textContent = String(this.quizStreak);
   };
 
+  LettersUI.prototype.updateTimedScoreUi = function () {
+    if (!this.elQuizTimedStatus || !this.elQuizTimedScoreBtn) return;
+
+    if (!this.quizTimedModeActive) {
+      this.elQuizTimedStatus.textContent = "限時計分：未開始";
+      this.elQuizTimedStatus.classList.remove("active");
+      this.elQuizTimedScoreBtn.textContent = "開始 1分30秒計分";
+      return;
+    }
+
+    var remainingMs = Math.max(0, this.quizTimedEndAt - Date.now());
+    var seconds = Math.ceil(remainingMs / 1000);
+    this.elQuizTimedStatus.textContent = "限時計分：剩 " + seconds + " 秒，答對 " + this.quizTimedCorrectCount + " 題";
+    this.elQuizTimedStatus.classList.add("active");
+    this.elQuizTimedScoreBtn.textContent = "停止計分";
+  };
+
+  LettersUI.prototype.stopTimedScore = function (isAutoFinished) {
+    if (this.quizTimedTimerId) {
+      clearInterval(this.quizTimedTimerId);
+      this.quizTimedTimerId = null;
+    }
+
+    var finalCorrectCount = this.quizTimedCorrectCount;
+    this.quizTimedModeActive = false;
+    this.quizTimedCorrectCount = 0;
+    this.quizTimedEndAt = 0;
+    this.updateTimedScoreUi();
+
+    if (isAutoFinished) {
+      this.elQuizFeedback.textContent = "限時計分結束：90 秒內答對 " + finalCorrectCount + " 題。";
+    }
+  };
+
+  LettersUI.prototype.startTimedScore = function () {
+    if (this.quizTimedModeActive) {
+      this.stopTimedScore(false);
+      return;
+    }
+
+    this.quizTimedModeActive = true;
+    this.quizTimedCorrectCount = 0;
+    this.quizTimedEndAt = Date.now() + this.quizTimedDurationMs;
+    this.updateTimedScoreUi();
+
+    var self = this;
+    this.quizTimedTimerId = setInterval(function () {
+      if (Date.now() >= self.quizTimedEndAt) {
+        self.stopTimedScore(true);
+        return;
+      }
+
+      self.updateTimedScoreUi();
+    }, 250);
+  };
+
   LettersUI.prototype.renderQuizHistory = function () {
     if (!this.elQuizHistoryList) return;
 
@@ -474,7 +537,9 @@
       this.quizLocked = true;
       this.quizScore += 1;
       this.quizStreak += 1;
+      if (this.quizTimedModeActive) this.quizTimedCorrectCount += 1;
       this.updateQuizStats();
+      this.updateTimedScoreUi();
       btn.classList.add("correct");
       this.recordQuizHistory();
       this.renderQuizHistory();
@@ -558,6 +623,12 @@
       });
     }
 
+    if (this.elQuizTimedScoreBtn) {
+      this.elQuizTimedScoreBtn.addEventListener("click", function () {
+        self.startTimedScore();
+      });
+    }
+
     if (this.elQuizPlayPromptBtn) {
       this.elQuizPlayPromptBtn.addEventListener("click", function () {
         self.playQuizPromptAudio();
@@ -565,6 +636,8 @@
     }
 
     this.bindQuizHistoryControls();
+    this.updateQuizStats();
+    this.updateTimedScoreUi();
     this.bindTabs();
   };
 

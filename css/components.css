@@ -390,3 +390,23 @@ button:active {
 .historyChoiceTag.wrong {
   border-color: var(--bad);
 }
+
+
+#quizTimedStatus.active {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  color: var(--accent-strong);
+}
+
+.siteFootnote {
+  text-align: center;
+  margin: 8px 0 2px;
+}
+
+.siteFootnote a {
+  color: var(--accent-strong);
+  text-decoration: none;
+}
+
+.siteFootnote a:hover {
+  text-decoration: underline;
+}

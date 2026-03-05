@@ -78,11 +78,13 @@
         </select>
         <button id="quizPlayPromptBtn" type="button">播放題目發音</button>
         <button id="nextQuizBtn" type="button">更換題目</button>
+        <button id="quizTimedScoreBtn" type="button">開始 1分30秒計分</button>
         <button id="quizHistoryBtn" type="button">答題歷史</button>
       </div>
       <div class="row quizStats" aria-label="測驗統計">
         <span class="tag">分數：<strong id="quizScore">0</strong></span>
         <span class="tag">連續答對：<strong id="quizStreak">0</strong></span>
+        <span class="tag" id="quizTimedStatus">限時計分：未開始</span>
       </div>
       <p class="small" id="quizHelp">看到字母後，選出正確英文讀音。</p>
       <div class="quizPrompt" id="quizPrompt">--</div>
@@ -115,6 +117,7 @@
       <h2>文法</h2>
       <div id="grammarList" class="grammarList"></div>
     </section>
+    <p class="small siteFootnote">這是我為了學俄語製作的小網頁，歡迎也逛逛我的主網站：<a href="https://keroro6262.github.io/" target="_blank" rel="noopener noreferrer">https://keroro6262.github.io/</a></p>
   </div>
 
   <script defer src="./js/data/letters.js"></script>
