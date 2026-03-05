@@ -20,6 +20,7 @@
     this.elQuizMode = document.getElementById("quizMode");
     this.elNextQuizBtn = document.getElementById("nextQuizBtn");
     this.elQuizTimedScoreBtn = document.getElementById("quizTimedScoreBtn");
+    this.elQuizResetScoreBtn = document.getElementById("quizResetScoreBtn");
     this.elQuizPlayPromptBtn = document.getElementById("quizPlayPromptBtn");
     this.elQuizScore = document.getElementById("quizScore");
     this.elQuizStreak = document.getElementById("quizStreak");
@@ -411,6 +412,12 @@
     }, 250);
   };
 
+  LettersUI.prototype.resetQuizScore = function () {
+    this.quizScore = 0;
+    this.updateQuizStats();
+    this.elQuizFeedback.textContent = "分數已重置。";
+  };
+
   LettersUI.prototype.renderQuizHistory = function () {
     if (!this.elQuizHistoryList) return;
 
@@ -626,6 +633,12 @@
     if (this.elQuizTimedScoreBtn) {
       this.elQuizTimedScoreBtn.addEventListener("click", function () {
         self.startTimedScore();
+      });
+    }
+
+    if (this.elQuizResetScoreBtn) {
+      this.elQuizResetScoreBtn.addEventListener("click", function () {
+        self.resetQuizScore();
       });
     }
 
