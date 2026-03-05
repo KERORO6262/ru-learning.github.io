@@ -19,6 +19,16 @@
     this.elQuizHelp = document.getElementById("quizHelp");
     this.elQuizMode = document.getElementById("quizMode");
     this.elNextQuizBtn = document.getElementById("nextQuizBtn");
+    this.elQuizPlayPromptBtn = document.getElementById("quizPlayPromptBtn");
+    this.elQuizScore = document.getElementById("quizScore");
+    this.elQuizStreak = document.getElementById("quizStreak");
+
+    this.elQuizHistoryBtn = document.getElementById("quizHistoryBtn");
+    this.elQuizHistoryDialog = document.getElementById("quizHistoryDialog");
+    this.elQuizHistoryLimit = document.getElementById("quizHistoryLimit");
+    this.elQuizHistoryApplyBtn = document.getElementById("quizHistoryApplyBtn");
+    this.elQuizHistoryClearBtn = document.getElementById("quizHistoryClearBtn");
+    this.elQuizHistoryList = document.getElementById("quizHistoryList");
 
     this.elVocabGrid = document.getElementById("vocabGrid");
     this.elGrammarList = document.getElementById("grammarList");
@@ -30,6 +40,12 @@
     this.currentBtn = null;
     this.quizAnswer = null;
     this.quizLocked = false;
+    this.quizCurrentLetter = null;
+    this.quizScore = 0;
+    this.quizStreak = 0;
+    this.quizHistoryLimit = 20;
+    this.quizHistory = [];
+    this.quizOptionTapStats = {};
   }
 
   LettersUI.prototype.setStatus = function (text) {
@@ -61,7 +77,7 @@
 
       var name = document.createElement("div");
       name.className = "name";
-      name.textContent = "讀法：" + letter.nameRu; 
+      name.textContent = "讀法：" + letter.nameRu;
 
       var hint = document.createElement("div");
       hint.className = "hint";
@@ -288,6 +304,12 @@
     this.speakText(text);
   };
 
+  LettersUI.prototype.playQuizPromptAudio = function () {
+    if (!this.quizCurrentLetter) return;
+    var promptPronunciation = this.quizCurrentLetter.soundRu || this.quizCurrentLetter.lower || "";
+    if (promptPronunciation) this.speakText(promptPronunciation);
+  };
+
   LettersUI.prototype.pickRandomItems = function (source, neededCount, skipItem) {
     var pool = [];
     for (var i = 0; i < source.length; i++) {
@@ -321,6 +343,89 @@
     };
   };
 
+  LettersUI.prototype.updateQuizStats = function () {
+    if (this.elQuizScore) this.elQuizScore.textContent = String(this.quizScore);
+    if (this.elQuizStreak) this.elQuizStreak.textContent = String(this.quizStreak);
+  };
+
+  LettersUI.prototype.renderQuizHistory = function () {
+    if (!this.elQuizHistoryList) return;
+
+    this.elQuizHistoryList.innerHTML = "";
+    var renderCount = Math.min(this.quizHistoryLimit, this.quizHistory.length);
+    if (!renderCount) {
+      this.elQuizHistoryList.textContent = "目前沒有作答紀錄。";
+      return;
+    }
+
+    for (var i = 0; i < renderCount; i++) {
+      var historyItem = this.quizHistory[i];
+      var card = document.createElement("div");
+      card.className = "historyItem";
+
+      var head = document.createElement("div");
+      head.className = "historyItemHead";
+
+      var promptBtn = document.createElement("button");
+      promptBtn.type = "button";
+      promptBtn.className = "historyPromptBtn";
+      promptBtn.textContent = historyItem.promptLabel;
+      promptBtn.addEventListener("click", this.speakText.bind(this, historyItem.promptAudio));
+
+      var result = document.createElement("span");
+      result.className = "tag";
+      result.textContent = "正解：" + historyItem.correctAnswer;
+
+      head.appendChild(promptBtn);
+      head.appendChild(result);
+      card.appendChild(head);
+
+      var choices = document.createElement("div");
+      choices.className = "historyChoices";
+      var optionStatsMap = historyItem.optionStats;
+      var optionNames = Object.keys(optionStatsMap);
+
+      for (var j = 0; j < optionNames.length; j++) {
+        var optionName = optionNames[j];
+        var optionStat = optionStatsMap[optionName];
+        var optionTag = document.createElement("span");
+        optionTag.className = "historyChoiceTag " + (optionStat.isCorrect ? "correct" : "wrong");
+        optionTag.textContent = optionName + " × " + optionStat.count;
+        choices.appendChild(optionTag);
+      }
+
+      card.appendChild(choices);
+      this.elQuizHistoryList.appendChild(card);
+    }
+  };
+
+  LettersUI.prototype.recordQuizHistory = function () {
+    if (!this.quizCurrentLetter) return;
+
+    var optionStats = {};
+    var optionNames = Object.keys(this.quizOptionTapStats);
+    for (var i = 0; i < optionNames.length; i++) {
+      var optionName = optionNames[i];
+      optionStats[optionName] = {
+        count: this.quizOptionTapStats[optionName],
+        isCorrect: optionName === this.quizAnswer
+      };
+    }
+
+    if (!optionStats[this.quizAnswer]) {
+      optionStats[this.quizAnswer] = { count: 0, isCorrect: true };
+    }
+
+    this.quizHistory.unshift({
+      promptLabel: this.quizCurrentLetter.upper + " " + this.quizCurrentLetter.lower,
+      promptAudio: this.quizCurrentLetter.soundRu || this.quizCurrentLetter.lower || "",
+      correctAnswer: this.quizAnswer,
+      optionStats: optionStats
+    });
+
+    if (this.quizHistory.length > 200) this.quizHistory.length = 200;
+  };
+
   LettersUI.prototype.nextQuiz = function () {
     var letters = window.RuLettersApp.LETTERS || [];
     if (!letters.length) return;
@@ -333,8 +438,10 @@
     options.push(answerLetter);
     options = this.pickRandomItems(options, options.length);
 
+    this.quizCurrentLetter = answerLetter;
     this.quizAnswer = config.answer(answerLetter);
     this.quizLocked = false;
+    this.quizOptionTapStats = {};
     this.elQuizPrompt.textContent = config.prompt(answerLetter);
     this.elQuizOptions.innerHTML = "";
     this.elQuizFeedback.textContent = "請選擇答案。";
@@ -349,8 +456,7 @@
       optionBtn.className = "quizOption";
       optionBtn.textContent = optionValue;
       optionBtn.dataset.value = optionValue;
-      optionBtn.dataset.say = optionLetter.soundRu || optionLetter.lower;
-      
+
       optionBtn.addEventListener("click", this.handleQuizAnswer.bind(this, optionBtn));
       this.elQuizOptions.appendChild(optionBtn);
     }
@@ -359,20 +465,67 @@
   LettersUI.prototype.handleQuizAnswer = function (btn) {
     if (this.quizLocked) return;
 
-    var letterPronunciation = btn.dataset.say || "";
-    if (letterPronunciation) this.speakText(letterPronunciation);
+    var selectedValue = btn.dataset.value || "";
+    if (!this.quizOptionTapStats[selectedValue]) this.quizOptionTapStats[selectedValue] = 0;
+    this.quizOptionTapStats[selectedValue] += 1;
 
-    var isCorrect = btn.dataset.value === this.quizAnswer;
+    var isCorrect = selectedValue === this.quizAnswer;
     if (isCorrect) {
       this.quizLocked = true;
+      this.quizScore += 1;
+      this.quizStreak += 1;
+      this.updateQuizStats();
       btn.classList.add("correct");
-      this.elQuizFeedback.textContent = "答對了！1 秒後切換下一題。";
-      setTimeout(this.nextQuiz.bind(this), 1000);
+      this.recordQuizHistory();
+      this.renderQuizHistory();
+      this.elQuizFeedback.textContent = "答對了！0.8 秒後切換下一題。";
+      setTimeout(this.nextQuiz.bind(this), 800);
       return;
     }
 
+    this.quizStreak = 0;
+    this.updateQuizStats();
     btn.classList.add("wrong");
+    this.playQuizPromptAudio();
     this.elQuizFeedback.textContent = "答錯了，再試一次。";
+
+  };
+
+  LettersUI.prototype.openQuizHistoryDialog = function () {
+    if (!this.elQuizHistoryDialog) return;
+    this.renderQuizHistory();
+    if (this.elQuizHistoryDialog.showModal) {
+      this.elQuizHistoryDialog.showModal();
+      return;
+    }
+    this.elQuizHistoryDialog.setAttribute("open", "open");
+  };
+
+  LettersUI.prototype.bindQuizHistoryControls = function () {
+    var self = this;
+    if (!this.elQuizHistoryDialog) return;
+
+    if (this.elQuizHistoryBtn) {
+      this.elQuizHistoryBtn.addEventListener("click", function () {
+        self.openQuizHistoryDialog();
+      });
+    }
+
+    if (this.elQuizHistoryApplyBtn) {
+      this.elQuizHistoryApplyBtn.addEventListener("click", function () {
+        var limitInput = Number(self.elQuizHistoryLimit.value);
+        self.quizHistoryLimit = Math.max(1, Math.min(200, limitInput || 20));
+        self.elQuizHistoryLimit.value = String(self.quizHistoryLimit);
+        self.renderQuizHistory();
+      });
+    }
+
+    if (this.elQuizHistoryClearBtn) {
+      this.elQuizHistoryClearBtn.addEventListener("click", function () {
+        self.quizHistory = [];
+        self.renderQuizHistory();
+      });
+    }
   };
 
   LettersUI.prototype.bindControls = function () {
@@ -405,6 +558,13 @@
       });
     }
 
+    if (this.elQuizPlayPromptBtn) {
+      this.elQuizPlayPromptBtn.addEventListener("click", function () {
+        self.playQuizPromptAudio();
+      });
+    }
+
+    this.bindQuizHistoryControls();
     this.bindTabs();
   };
 

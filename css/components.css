@@ -297,3 +297,96 @@ button:active {
   .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .vocabCategoryGrid { grid-template-columns: 1fr; }
 }
+
+.quizStats {
+  gap: 8px;
+}
+
+.historyDialog {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0;
+  width: min(760px, calc(100vw - 24px));
+  background: var(--surface);
+  color: var(--text);
+}
+
+.historyDialog::backdrop {
+  background: rgba(8, 15, 28, 0.5);
+}
+
+.historyDialogBody {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.historyDialogHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.historyDialogHeader h3 {
+  margin: 0;
+}
+
+#quizHistoryLimit {
+  width: 88px;
+  background: var(--control-bg);
+  color: var(--text);
+  border: 1px solid var(--control-border);
+  border-radius: 12px;
+  padding: 11px 13px;
+  font-size: 14px;
+}
+
+.historyList {
+  max-height: 420px;
+  overflow: auto;
+  display: grid;
+  gap: 8px;
+}
+
+.historyItem {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  background: var(--control-bg);
+  display: grid;
+  gap: 8px;
+}
+
+.historyItemHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.historyPromptBtn {
+  font-size: 18px;
+  font-weight: 700;
+  padding: 6px 10px;
+}
+
+.historyChoices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.historyChoiceTag {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.historyChoiceTag.correct {
+  border-color: var(--ok);
+}
+
+.historyChoiceTag.wrong {
+  border-color: var(--bad);
+}
